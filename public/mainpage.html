@@ -1,0 +1,118 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+</head>
+<body>
+    <div>
+        <div>
+            <textarea id="tweetContent" class="input-field" placeholder="Username"></textarea>
+            <button class="input-field" onclick="postTweet()">Tweet</button>                
+        </div>
+        <button class="input-field" onclick="logout()">Log Out</button>
+        <div id="postList">
+        </div>
+        <button class="input-field" onclick="logout()">Log Out</button>
+    </div>
+</body>
+<script>
+
+    let loggedUsername = Cookies.get("username");
+    let serverUrl = `http://${window.location.host}/api`
+    if(loggedUsername == 'null' || typeof loggedUsername == undefined || loggedUsername == '')
+        window.location.replace('/login.html');
+
+    function logout(){
+        Cookies.set("username", null);
+        window.location.replace('/login.html');
+    }
+
+    function postTweet(){
+        let tweetContent = document.getElementById("tweetContent").value;
+        if(tweetContent.length > 160){
+            alert("Maximum characters exceded. Allowed only 160 characters");
+        }  
+        else {
+            sendTweet(loggedUsername, tweetContent)
+        }
+    }
+
+    function sendTweet(userName, tweetContent){
+        $.post(`${serverUrl}/post/create`, {PostedBy: loggedUsername, Text: tweetContent}, function(data, status){
+        });
+    }
+
+    function sendcomment(postId) {
+        let comment = document.getElementById(`${postId}commentinput`).value;
+    
+        $.post(`${serverUrl}/comment/create`, {PostId: postId, CommentedBy: loggedUsername, Text: comment}, function(data, status){
+            document.getElementById(`${postId}commentinput`).value = '';
+        });
+    }
+
+    function showcomment(postId){
+        document.getElementById(`${postId}commentpane`).style.display = 'block'
+    }
+
+    function reactPost(postId){
+        $.post(`${serverUrl}/post/reactPost`, {ReactBy: loggedUsername, PostId: postId}, function(data, status){
+            toggleLikeButton(postId, data.msg);
+        });
+    }
+
+    function toggleLikeButton(postId, status){
+        if(status == true){
+            document.getElementById(`${postId}react`).classList.add('fa-heart');
+            document.getElementById(`${postId}react`).classList.remove('fa-heart-o');
+            document.getElementById(`${postId}react`).style.color = '#ff0000';
+        }
+        else {
+            document.getElementById(`${postId}react`).classList.add('fa-heart-o');
+            document.getElementById(`${postId}react`).classList.remove('fa-heart');
+            document.getElementById(`${postId}react`).style.color = '#000000';
+        }
+    }
+
+    $(document).ready(function(){
+        $.get(`${serverUrl}/post/fetch`, function(data, status){
+            let postListJson = data.msg;
+            let postList = ""
+            for(let i=0; i<postListJson.length; i++){
+                let commentList = ""
+                let commentListJson = postListJson[i].Comments;
+
+                for(let j=0; j<commentListJson.length; j++){
+                    commentList = commentList + `<div>
+                        <p><span style="font-weight: bold">${commentListJson[j].CommentedBy}&nbsp;</span>${commentListJson[j].Text}</p>
+                    </div>`;
+                }
+                let reactclass, reactcolor = '';
+                if(postListJson[i].Likes.includes(loggedUsername)){
+                    reactclass = 'fa fa-heart react-active';
+                    reactcolor = '#ff0000'
+                }
+                else {
+                    reactclass = 'fa fa-heart-o react-active';
+                    reactcolor = '#000000'
+                }
+
+                postList = postList + `<div class="post-card">
+                <p>${postListJson[i].PostedBy}</p>
+                <p>${postListJson[i].Text}</p>
+                <i class="fa fa-comment-o" id="${postListJson[i]._id}comment" onclick="showcomment('${postListJson[i]._id}')">${postListJson[i].Comments.length} &nbsp;</i>
+                <i class="${reactclass}" style="color: ${reactcolor}" id="${postListJson[i]._id}react" onclick="reactPost('${postListJson[i]._id}')"><span style="color:#000000">${postListJson[i].Likes.length}</span></i><br/>
+                <div id="${postListJson[i]._id}commentpane" style="display: none">
+                    ${commentList}
+                </div>
+                <input id="${postListJson[i]._id}commentinput" placeholder="Comment" />
+                <button id="${postListJson[i]._id}commentbutton" onclick="sendcomment('${postListJson[i]._id}')">Send Comment</button>
+            </div>`;
+            }
+
+            document.getElementById("postList").innerHTML = postList;
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,22 @@
+<html>
+<head>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+</head>
+<body>
+    <div>
+        <center>
+            <p>Login</p>
+            <input id="username" class="input-field" placeholder="Username"></input><br/>
+            <button class="input-field" onclick="login()">Login</button>                
+        </center>
+    </div>
+</body>
+<script>
+    function login(){
+        let username = document.getElementById("username").value;
+        Cookies.set("username", username);
+        window.location.replace('/mainpage.html');
+    }
+</script>
+</html>

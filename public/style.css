@@ -1,0 +1,17 @@
+.input-field {
+    padding: 20;
+    border: 1px solid #eaeaea;
+    margin: 20;
+}
+
+.post-card {
+    padding: 20
+}
+
+.react-active {
+    color: '#ff0000'
+}
+
+.react-inactive {
+    color: '#000000'
+}
