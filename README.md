@@ -2,6 +2,12 @@
 
 This is a simple clone of Twitter
 
+## Prerequisite
+
+npm,
+nodejs,
+MongoDb
+
 ## Installation
 
 Pull from github (link above)
@@ -10,12 +16,6 @@ Pull from github (link above)
 npm install
 node index.js
 ```
-
-## Prerequisite
-
-npm,
-nodejs,
-MongoDb
 
 ## Usage
 
