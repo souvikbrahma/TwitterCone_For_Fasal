@@ -3,6 +3,7 @@ var path = require("path");
 var bodyParser = require("body-parser");
 const errorHandler = require("./handlers/errorHandler");
 var mongoose = require("mongoose");
+var opn = require('opn');
 var appConfig = require("./configs/appConfig");
 var session = require("express-session");
 var connectMongo = require("connect-mongo");
@@ -39,6 +40,7 @@ function start(config) {
 
       mongoose.connection.on("connected", () => {
         console.log("SUCCESSFULLY CONNECTED TO DB");
+        opn('http://localhost:4200/login.html');
       });
 
       mongoose.connection.on("disconnected", () => {

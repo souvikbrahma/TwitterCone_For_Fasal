@@ -8,7 +8,7 @@
 <body>
     <div>
         <div>
-            <textarea id="tweetContent" class="input-field" placeholder="Username"></textarea>
+            <textarea id="tweetContent" class="input-field" placeholder="Write a post...."></textarea>
             <button class="input-field" onclick="postTweet()">Tweet</button>                
         </div>
         <button class="input-field" onclick="logout()">Log Out</button>
@@ -41,6 +41,7 @@
 
     function sendTweet(userName, tweetContent){
         $.post(`${serverUrl}/post/create`, {PostedBy: loggedUsername, Text: tweetContent}, function(data, status){
+            getPost();
         });
     }
 
@@ -49,6 +50,7 @@
     
         $.post(`${serverUrl}/comment/create`, {PostId: postId, CommentedBy: loggedUsername, Text: comment}, function(data, status){
             document.getElementById(`${postId}commentinput`).value = '';
+            getPost();
         });
     }
 
@@ -76,6 +78,10 @@
     }
 
     $(document).ready(function(){
+        getPost();
+    });
+
+    function getPost(){
         $.get(`${serverUrl}/post/fetch`, function(data, status){
             let postListJson = data.msg;
             let postList = ""
@@ -108,11 +114,12 @@
                 </div>
                 <input id="${postListJson[i]._id}commentinput" placeholder="Comment" />
                 <button id="${postListJson[i]._id}commentbutton" onclick="sendcomment('${postListJson[i]._id}')">Send Comment</button>
-            </div>`;
+                </div>`;
             }
 
             document.getElementById("postList").innerHTML = postList;
-        });
-    });
+        }); 
+    }
+
 </script>
 </html>
