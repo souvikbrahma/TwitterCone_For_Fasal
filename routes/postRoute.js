@@ -8,7 +8,6 @@ router.post("/create", async (req, res, next) => {
   try {
     let { PostedBy, Text } = req.body;
     
-    console.log(PostedBy, Text);
     if(Text.length > 160)
       next("Characted range exceded");
 
@@ -39,8 +38,6 @@ router.post("/reactPost", async (req, res, next) => {
 
 router.get("/fetch", async (req, res, next) => {
   try {
-    // let { PostedBy, Text } = req.body;
-    
     let posts = await postController.fetch({}, "", {CreatedOn: -1}, {path: "Comments"});
     
     return res.json(statusHandler.successMsg(posts));
